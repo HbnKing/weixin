@@ -106,14 +106,28 @@ class WeixinApi
                         break;
                     case 'CLICK':
                         switch($obj->EventKey){
-                            case 'STORY': //回复一个文本消息
-                                $replyContent = "感谢你的点击，开发路才刚开始呢，还没有更多故事呢！";
+                            case 'STORY':
+                                $replyContent = "姓名：王恒
+                                				email：hbn.king@gmail.com
+                                                民族： 汉   出生年月：1989/05
+                                                学历： 本科  居住地址：上海浦东
+                                                性别： 男  电话： 15527156520
+                                                求职意向 
+                                                到岗时间：即时
+                                                期望职位：php程序员
+                                                工作性质：全职
+                                                专业技能
+                                                1、熟练掌握php，html，div+css，等web开发技术。
+                                                2、熟练使用pdo、mysql方式操作mysql数据库系统，熟悉mysql事物及存储过程。
+                                                3、熟悉html，div+css前台页面技术和xml的使用。
+                                                4、熟悉网页静态化、smarty缓存，thinkphp缓存，掌握web防sql注入。
+                                                5、 孰悉mvc架构开发思想模式，熟练使用smarty模板，thinkphp框架,zendframework框架。
+                                                6、熟练掌握zend studio, phpstorm, eclipsephp等常用web开发工具；
+                                                7、了解linux基本操作。";
                                 return $this->replyText($obj,$replyContent);
+
                                 break;
-                            default:
-                                $replyContent = "感谢你的点击";
-                                return $replyContent;
-                                break;
+                              
                         }
                         break;
                     default:
@@ -129,32 +143,33 @@ class WeixinApi
         //关键字回复
         switch ($content) {
             case '女神':
-                return $this->replyText($obj,"TEL：138000000 \n QQ：1559299956");
+                return $this->replyText($obj,"姓名：女神\nTEL：138000000 \n QQ：1559299956");
                 break;
             case '男神':
-                return $this->replyText($obj,"别称：大黑龙 \n QQ：1559299956");
+                return $this->replyText($obj,"姓名：男神\n别称：大黑龙 \n QQ：1559299956");
                 break;
+              
             case '多图文':
                     //回复多图文消息
                     //采用数组遍历的模式添加列表
 
                     $newsArr = array(
                         array(
-                            'Title'=>"wamp，你确定？！",
+                            'Title'=>"开源中国？！",
                             'Description'=>"玩的就是免费就是这么任性！",
                             'PicUrl'=>"http://1.goddess.applinzi.com/images/1.jpg",
-                            'Url'=>"http://health.sohu.com/20170218/n481075720.shtml"
+                            'Url'=>"https://www.oschina.net/"
                         ),
                         array(
                             'Title'=>"appach",
-                            'Description'=>"很久很久以前……………………",
-                            'PicUrl'=>"http://1.goddess.applinzi.com/images/1.jpg",
+                            'Description'=>"很久以前……………………",
+                            'PicUrl'=>"http://1.goddess.applinzi.com/images/3.jpg",
                             'Url'=>"http://kimi.it/339.html"
                         ),
                         array(
                             'Title'=>"php",
                             'Description'=>"你还在打工么",
-                            'PicUrl'=>"http://1.goddess.applinzi.com/images/1.jpg",
+                            'PicUrl'=>"http://1.goddess.applinzi.com/images/2.jpg",
                             'Url'=>"http://www.itheima.com/phpmap"
                         )
                     );
@@ -263,74 +278,11 @@ class WeixinApi
         return json_decode($outopt,true);//返回数组结果
     }
     //获取接口调用凭证access_token
-    /*public function getAccessToken()
+    public function getAccessToken()
     {
         $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$this->appid}&secret={$this->appsecret}";
         $result = $this->https_request($url);
         return $result['access_token'];
-    }
-    */
-
-    //获取接口调用凭证access_token 使用文件缓存access_token
-/*    public function getAccessToken()
-    {
-        //文件读取json数据
-        $data = json_decode(file_get_contents("./access_token.json"));
-        if($data->expires_time < time())
-        {
-            $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$this->appid}&secret={$this->appsecret}";
-            $result = $this->https_request($url);
-            $access_token = $result['access_token'];
-            //文件写入json数据
-            $data->access_token = $result['access_token'];
-            $data->expires_time = time() + 7000;
-            $fp = fopen("access_token.json","w");
-            fwrite($fp,json_encode($data));
-            fclose($fp);
-        }
-        else
-        {
-            $access_token = $data->access_token;
-        }
-        return $access_token;
-    }*/
-    //获取接口调用凭证access_token memcache缓存access_token
-    public function getAccessToken()
-    {
-        $access_token = $this->_memcache_get("access_token");
-        if(!$access_token)  //
-        {
-            $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$this->appid}&secret={$this->appsecret}";
-            $result = $this->https_request($url);
-            $this->_memcache_set("access_token",$result['access_token'],7000);//返回之前调用缓存器存储
-            return $result['access_token'];
-        }
-
-        return $access_token;
-    }
-    //实例化memcache     可在外部先启用缓存处理器
-    public function _memcache_init()
-    {
-        //实例化对象
-        $mmc = new Memcache();
-
-        $mmc->connect();//使用当前应用的memcache
-
-        return $mmc;
-    }
-
-    //设置memcache
-    public function _memcache_set($key,$value,$time=0)   //设置初始的时间为0即为永久有效
-    {
-        $mmc = $this->_memcache_init();
-        $mmc->set($key,$value,0,$time);
-    }
-
-    //获取memcache
-    public function _memcache_get($key)
-    {
-        $mmc = $this->_memcache_init();
-        return $mmc->get($key);
     }
     //自定义菜单创建
     public function menu_create($post)
@@ -355,7 +307,8 @@ class WeixinApi
         $url = "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token={$access_token}";
         return $this->https_request($url);
     }
-        //获取网页授权的内容未添加
+    
+    
 }
 
 

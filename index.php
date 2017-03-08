@@ -1,7 +1,17 @@
 <?php
-require("weixin_oop_api.php");
-define("TOKEN","goddess");
-$echostr=$_GET["echostr"];//随机字符串。
+	require('weixin_oop_api.php');
+	define("TOKEN","goddess");
+	$echostr = $_GET['echostr'];//随机字符串
 
-$wx=new WeixinApi();
-$wx->valid();
+	$wx = new WeixinApi();
+
+	if(isset($_GET['echostr']))
+	{
+		$wx->valid();
+	}
+	else
+	{
+		$wx->responseMsg();
+	}
+	
+?>
